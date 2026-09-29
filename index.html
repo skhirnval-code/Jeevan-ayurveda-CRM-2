@@ -65,7 +65,7 @@ const NAV=[
 
 /* ===== BACKEND API URL =====
    Apps Script me Deploy > New deployment > Web app karke jo URL mile (…/exec), use yahan paste karein. */
-const API_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwgj4MyA7toHS7xVNFarloS9HEGwufigK6-kCUW4tfW06qls0l8xlRhb8UYd-tt2bTM/exec';
 
 async function gs(action,payload={}){
   if(!API_URL || API_URL.indexOf('script.google.com')<0){toast('Backend URL set nahi hai (index.html me API_URL)');throw new Error('API_URL missing');}
