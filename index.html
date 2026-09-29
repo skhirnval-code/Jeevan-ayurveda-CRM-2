@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>HERBS CRM</title>
+  <style>
+    :root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--line:#e5e9f0;--primary:#2563eb;--danger:#dc2626;--success:#16a34a;--dark:#111827}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+    .login{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#111827,#2563eb)}
+    .login-card{width:min(420px,92vw);background:#fff;border-radius:20px;padding:30px;box-shadow:0 20px 60px #0004}
+    .brand{font-size:26px;font-weight:800;margin-bottom:5px}.sub{color:var(--muted);margin-bottom:24px}
+    .field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}
+    input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;outline:none}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px #2563eb18}
+    .btn{padding:9px 13px;border-radius:9px;background:#eef2f7;color:var(--text);font-weight:700}.btn.primary{background:var(--primary);color:#fff}.btn.danger{background:#fee2e2;color:#991b1b}.btn.success{background:#dcfce7;color:#166534}
+    .app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.sidebar{background:#111827;color:#fff;padding:18px;position:sticky;top:0;height:100vh;overflow:auto}
+    .side-brand{font-size:21px;font-weight:900;padding:8px 10px}.tag{font-size:11px;color:#9ca3af;padding:0 10px 18px}.nav a{display:block;color:#d1d5db;text-decoration:none;padding:10px;border-radius:8px;margin:3px 0}.nav a:hover,.nav a.active{background:#1f2937;color:#fff}
+    .userbox{position:absolute;bottom:15px;left:15px;right:15px;border-top:1px solid #374151;padding-top:14px}.top{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 18px;position:sticky;top:0;z-index:5}
+    .main{min-width:0}.content{padding:18px}.title{font-size:24px;font-weight:800}.muted{color:var(--muted)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .grid{display:grid;gap:12px}.kpis{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin:15px 0}.kpi{background:var(--card);border:1px solid var(--line);padding:16px;border-radius:14px}.kpi .n{font-size:25px;font-weight:850;margin-top:5px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:14px}.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:900px}.table th,.table td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:13px;vertical-align:top}.table th{font-size:11px;color:var(--muted);text-transform:uppercase}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;font-size:11px;font-weight:700}.pill.green{background:#dcfce7;color:#166534}.pill.red{background:#fee2e2;color:#991b1b}.pill.yellow{background:#fef3c7;color:#92400e}
+    .tabs{display:flex;gap:7px;overflow:auto;padding-bottom:8px}.tab{white-space:nowrap}.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.full{grid-column:1/-1}
+    .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;padding:12px 16px;border-radius:10px;z-index:20}.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;z-index:15;padding:15px}.modalbox{background:#fff;border-radius:15px;max-width:900px;width:100%;max-height:92vh;overflow:auto;padding:20px}
+    @media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{display:none}.formgrid{grid-template-columns:1fr}.top{position:sticky}}
+  </style>
+</head>
+<body>
+<div id="login" class="login">
+  <div class="login-card">
+    <div class="brand">🌿 HERBS CRM</div><div class="sub">Sales • Orders • Dealers • Reports</div>
+    <div class="field"><label>Username</label><input id="loginUser" value="admin"></div>
+    <div class="field"><label>Password</label><input id="loginPass" type="password" value="admin123"></div>
+    <button class="btn primary" style="width:100%;margin-top:8px" onclick="login()">Sign In</button>
+    <div id="loginErr" class="muted" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="side-brand">🌿 HERBS CRM</div><div class="tag">Order & Dealer Management</div>
+    <nav class="nav" id="nav"></nav>
+    <div class="userbox"><div id="sideUser"></div><div class="muted" id="sideRole"></div><button class="btn" style="margin-top:8px" onclick="logout()">Sign Out</button></div>
+  </aside>
+  <section class="main">
+    <header class="top"><button class="btn" onclick="toggleSide()">☰</button><strong id="pageTitle">Dashboard</strong><span style="flex:1"></span><button class="btn" onclick="toggleDark()">🌙</button></header>
+    <main class="content" id="view"></main>
+  </section>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modalbox" id="modalBox"></div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+let token=sessionStorage.getItem('crmToken')||'', me=null, boot=null, currentPage='dashboard', dark=false;
+
+const NAV=[
+ ['dashboard','📊 Dashboard'],['orders','📦 Manage Orders'],['dealers','🏪 Dealer Management'],['ledger','💰 Payment Ledger'],
+ ['invoices','🧾 Manage Invoice'],['reports','📈 Reports'],['sales','📊 Sales Report'],['incentive','💵 Incentive'],
+ ['courier','🚚 Courier Performance'],['calls','☎️ Call Monitoring'],['users','👥 Users & Access'],
+ ['settings','⚙️ Settings'],['health','🩺 System Health'],['audit','🧾 Audit Logs'],['shiprocket','📦 Shiprocket'],['indiapost','📮 India Post']
+];
+
+function gs(action,payload={}){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(r=>{if(r&&r.ok===false){toast(r.error||'Error');reject(r.error)}else resolve(r)}).withFailureHandler(e=>{toast(e.message||e);reject(e)}).api(action,Object.assign({token},payload))})}
+function toast(x){const e=document.getElementById('toast');e.textContent=x;e.classList.remove('hidden');setTimeout(()=>e.classList.add('hidden'),2500)}
+async function login(){
+  try{const r=await gs('login',{username:loginUser.value,password:loginPass.value});token=r.token;sessionStorage.setItem('crmToken',token);me=r.user;boot=await gs('bootstrap');showApp()}
+  catch(e){document.getElementById('loginErr').textContent='Login failed. '+(e.message||e)}
+}
+async function init(){if(!token)return;try{boot=await gs('bootstrap');me=boot.user;showApp()}catch(e){logout()}}
+function showApp(){
+ document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');
+ document.getElementById('sideUser').textContent=me.name;document.getElementById('sideRole').textContent=me.role;
+ renderNav();go('dashboard');
+}
+function renderNav(){
+ const n=document.getElementById('nav');n.innerHTML='';
+ NAV.forEach(x=>{const a=document.createElement('a');a.href='#';a.dataset.page=x[0];a.textContent=x[1];a.onclick=e=>{e.preventDefault();go(x[0])};n.appendChild(a)});
+}
+function go(page){currentPage=page;document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.page===page));document.getElementById('pageTitle').textContent=(NAV.find(x=>x[0]===page)||['','CRM'])[1].replace(/^\\S+\\s/,'');const v=document.getElementById('view');v.innerHTML='<div class="card">Loading...</div>';({dashboard:renderDashboard,orders:renderOrders,dealers:renderDealers,ledger:renderLedger,invoices:renderInvoices,reports:renderReports,sales:renderSales,incentive:renderIncentive,courier:renderCourier,calls:renderCalls,users:renderUsers,settings:renderSettings,health:renderHealth,audit:renderAudit,shiprocket:renderShiprocket,indiapost:renderIndiaPost}[page]||renderDashboard)()}
+function rangeBar(){return `<div class="row"><select id="range" onchange="refreshCurrent()"><option value="today">Today</option><option value="yesterday">Yesterday</option><option value="3days">3 Days</option><option value="7days">7 Days</option><option value="15days">15 Days</option><option value="30days">30 Days</option><option value="thismonth">This Month</option><option value="lastmonth">Last Month</option><option value="all">All Time</option></select><input id="from" type="date"><input id="to" type="date"><button class="btn" onclick="refreshCurrent()">Refresh</button></div>`}
+async function renderDashboard(){
+ const v=document.getElementById('view');v.innerHTML=`<div class="between"><div><div class="title">Dashboard</div><div class="muted">CRM overview</div></div>${rangeBar()}</div><div id="dash"></div>`;
+ const r=await gs('dashboard',{range:'today'});dashHTML(r);
+}
+function dashHTML(r){
+ document.getElementById('dash').innerHTML=`<div class="grid kpis">
+ ${[['Orders',r.total],['Revenue','₹'+money(r.revenue)],['Online Received','₹'+money(r.online)],['COD Pending','₹'+money(r.cod)],['Confirmed',r.confirmed],['Pending',r.pending],['Delivered',r.delivered],['Cancelled',r.cancelled],['Follow-ups Today',r.followToday],['Overdue',r.overdue]].map(x=>`<div class="kpi"><div class="muted">${x[0]}</div><div class="n">${x[1]}</div></div>`).join('')}
+ </div>
+ <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+  ${groupCard('Order Status',r.status)}${groupCard('Top Sources',r.source)}${groupCard('Top Products',r.product)}${groupCard('Top States',r.state)}
+ </div>
+ <div class="card"><div class="between"><b>Recent Orders</b><button class="btn primary" onclick="go('orders')">Open Orders →</button></div>${simpleTable(r.recent,['orderNo','customerName','phone','product','total','status'])}</div>`;
+}
+function groupCard(title,obj){const a=Array.isArray(obj)?obj:Object.entries(obj).map(x=>({name:x[0],count:x[1]}));return `<div class="card"><b>${title}</b>${a.slice(0,8).map(x=>`<div class="between" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${esc(x.name)}</span><strong>${x.count}</strong></div>`).join('')}</div>`}
+async function renderOrders(){
+ const v=document.getElementById('view');v.innerHTML=`<div class="between"><div><div class="title">Manage Orders</div><div class="muted">All CRM orders</div></div><div class="row"><button class="btn primary" onclick="openOrder()">+ New Order</button><button class="btn" onclick="openImport()">Bulk Upload</button></div></div>
+ <div class="card"><div class="filters"><input id="fCustomer" placeholder="Customer"><input id="fPhone" placeholder="Phone"><input id="fOrder" placeholder="Order ID"><select id="fStatus"><option value="">All Status</option>${boot.statuses.map(x=>`<option>${esc(x.name)}</option>`).join('')}</select><select id="fSource"><option value="">All Sources</option>${boot.sources.map(x=>`<option>${esc(x.name)}</option>`).join('')}</select><input id="fCity" placeholder="City"><input id="fState" placeholder="State"><button class="btn primary" onclick="loadOrders()">Search</button></div></div>
+ <div class="card" id="ordersBox">Loading...</div>`;
+ loadOrders();
+}
+async function loadOrders(){
+ const f={customer:fCustomer.value,phone:fPhone.value,orderNo:fOrder.value,status:fStatus.value,source:fSource.value,city:fCity.value,state:fState.value};
+ const r=await gs('orders',{filters:f,page:1,pageSize:100});document.getElementById('ordersBox').innerHTML=`<div class="between"><b>${r.total} orders</b><span class="muted">Page ${r.page}/${r.pages}</span></div>${orderTable(r.rows)}`;
+}
+function orderTable(rows){return `<div class="tablewrap"><table class="table"><thead><tr>${['','Order ID','Date','Customer','Phone','Product','Qty','Total','Online','Balance','Status','Source','City','Dealer','AWB','Actions'].map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(o=>`<tr><td><input type="checkbox" class="sel" value="${o.id}"></td><td><b>${esc(o.orderNo)}</b></td><td>${fmt(o.orderDate||o.createdAt)}</td><td>${esc(o.customerName)}</td><td><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></td><td>${esc(o.product)}</td><td>${o.qty}</td><td>₹${money(o.total)}</td><td>₹${money(o.online)}</td><td>₹${money(o.balance)}</td><td><span class="pill">${esc(o.status)}</span></td><td>${esc(o.source)}</td><td>${esc(o.city)}</td><td>${esc(o.dealerCode)}</td><td>${esc(o.awb)}</td><td><button class="btn" onclick="openOrder('${o.id}')">Edit</button> <button class="btn danger" onclick="delOrder('${o.id}')">Del</button></td></tr>`).join('')}</tbody></table></div>`}
+function openOrder(id){
+ const o=id?null:{qty:1,status:'New',source:'Orders',paymentMode:'COD',paymentStatus:'Pending',unitPrice:0,online:0};
+ if(id)gs('getOrder',{id}).then(r=>orderModal(r.order));else orderModal(o);
+}
+function orderModal(o){
+ document.getElementById('modalBox').innerHTML=`<div class="between"><h2>${o.id?'Edit':'New'} Order</h2><button class="btn" onclick="closeModal()">×</button></div>
+ <div class="formgrid">
+ ${field('Customer Name','oName',o.customerName,'required')} ${field('Contact Number','oPhone',o.phone,'required')}
+ ${field('Alternate Mobile','oAlt',o.altPhone)} ${field('Email','oEmail',o.email)}
+ ${field('Product','oProduct',o.product,'required')} ${field('Extra','oExtra',o.extra)}
+ ${field('Quantity','oQty',o.qty,'number')} ${field('Unit Price','oPrice',o.unitPrice,'number')}
+ ${field('Online Received','oOnline',o.online,'number')} ${selectField('Payment Mode','oMode',['COD','Prepaid','Partial'],o.paymentMode)}
+ ${selectField('Payment Status','oPayStatus',['Pending','Completed'],o.paymentStatus)} ${selectField('Status','oStatus',boot.statuses.map(x=>x.name),o.status)}
+ ${field('Address','oAddress',o.address,'','full')} ${field('Pincode','oPin',o.pincode)} ${field('City','oCity',o.city)}
+ ${field('State','oState',o.state)} ${field('District','oDistrict',o.district)} ${field('Source','oSource',o.source)}
+ ${field('Follow-up Date','oFollow',o.followupAt?String(o.followupAt).slice(0,10):'','date')} ${field('Remark','oRemark',o.remark,'','full')}
+ </div><div class="row" style="margin-top:15px"><button class="btn primary" onclick='saveOrder(${JSON.stringify(o).replace(/'/g,"&#39;")})'>Save Order</button><button class="btn" onclick="closeModal()">Cancel</button></div>`;
+ document.getElementById('modal').classList.remove('hidden');
+}
+function field(label,id,val='',type='',cls=''){return `<div class="${cls} field"><label>${label}</label><input id="${id}" type="${type||'text'}" value="${esc(val??'')}"></div>`}
+function selectField(label,id,arr,val=''){return `<div class="field"><label>${label}</label><select id="${id}">${arr.map(x=>`<option ${String(x)===String(val)?'selected':''}>${esc(x)}</option>`).join('')}</select></div>`}
+async function saveOrder(old){
+ const o=Object.assign({},old,{customerName:oName.value,phone:oPhone.value,altPhone:oAlt.value,email:oEmail.value,product:oProduct.value,extra:oExtra.value,qty:+oQty.value||1,unitPrice:+oPrice.value||0,online:+oOnline.value||0,paymentMode:oMode.value,paymentStatus:oPayStatus.value,status:oStatus.value,address:oAddress.value,pincode:oPin.value,city:oCity.value,state:oState.value,district:oDistrict.value,source:oSource.value,followupAt:oFollow.value,remark:oRemark.value});
+ await gs('saveOrder',{order:o});closeModal();toast('Order saved');loadOrders();
+}
+async function delOrder(id){if(!confirm('Delete this order?'))return;await gs('deleteOrder',{id});toast('Order deleted');loadOrders()}
+function openImport(){document.getElementById('modalBox').innerHTML=`<div class="between"><h2>Smart Import</h2><button class="btn" onclick="closeModal()">×</button></div><p class="muted">Paste CSV with headers matching Order fields.</p><textarea id="csv" rows="12" placeholder="customerName,phone,product,qty,unitPrice,status,source"></textarea><button class="btn primary" onclick="importCSV()">Import</button>`;document.getElementById('modal').classList.remove('hidden')}
+async function importCSV(){const lines=csv.value.trim().split(/\\r?\\n/);if(lines.length<2)return;const h=lines.shift().split(',').map(x=>x.trim());const rows=lines.map(line=>{const a=line.split(',');const o={};h.forEach((k,i)=>o[k]=a[i]||'');return o});await gs('importOrders',{rows});closeModal();toast('Import complete');loadOrders()}
+
+async function renderDealers(){const v=document.getElementById('view');v.innerHTML=`<div class="between"><div><div class="title">Dealer Management</div></div><button class="btn primary" onclick="openDealer()">Create New Dealer</button></div><div class="card"><div class="row"><input id="dealerSearch" placeholder="Search dealer / code / mobile"><button class="btn" onclick="loadDealers()">Search</button></div></div><div class="card" id="dealerBox">Loading...</div>`;loadDealers()}
+async function loadDealers(){const r=await gs('dealers',{filters:{search:dealerSearch.value}});dealerBox.innerHTML=simpleTable(r.rows,['code','name','mobile','city','state','territory','zm','defaultMargin','active'],true)}
+function openDealer(d){d=d||{active:true,defaultMargin:0,minStock:20};document.getElementById('modalBox').innerHTML=`<div class="between"><h2>${d.id?'Edit':'New'} Dealer</h2><button class="btn" onclick="closeModal()">×</button></div><div class="formgrid">${['name','code','username','firmName','contactPerson','mobile','altMobile','email','gst','pan','address','city','pincode','territory','state','district','creditLimit','openingStock','defaultMargin','minStock','notes'].map(k=>field(k.replace(/([A-Z])/g,' $1'), 'd_'+k,d[k])).join('')}</div><button class="btn primary" onclick='saveDealer(${JSON.stringify(d)})'>Save Dealer</button>`;document.getElementById('modal').classList.remove('hidden')}
+async function saveDealer(old){const d=Object.assign({},old);['name','code','username','firmName','contactPerson','mobile','altMobile','email','gst','pan','address','city','pincode','territory','state','district','creditLimit','openingStock','defaultMargin','minStock','notes'].forEach(k=>d[k]=document.getElementById('d_'+k).value);await gs('saveDealer',{dealer:d});closeModal();toast('Dealer saved');loadDealers()}
+
+async function renderLedger(){document.getElementById('view').innerHTML=`<div class="title">Payment Ledger</div><div class="card"><div class="row"><select id="ledDealer"><option value="">All Dealers</option>${boot.dealers.map(x=>`<option value="${x.code}">${x.code} - ${esc(x.name)}</option>`).join('')}</select><button class="btn" onclick="loadLedger()">Load</button><button class="btn primary" onclick="addPay()">+ Add Payment</button></div></div><div class="card" id="ledgerBox"></div>`;loadLedger()}
+async function loadLedger(){const r=await gs('ledger',{dealerCode:ledDealer.value});ledgerBox.innerHTML=`<div class="kpis grid"><div class="kpi">Sales<div class="n">₹${money(r.summary.sale)}</div></div><div class="kpi">Paid<div class="n">₹${money(r.summary.paid)}</div></div><div class="kpi">Balance<div class="n">₹${money(r.summary.balance)}</div></div></div>${simpleTable(r.rows,['id','date','particular','debit','credit','running'])}`}
+function addPay(){document.getElementById('modalBox').innerHTML=`<h2>Add Payment</h2>${selectField('Dealer','pDealer',boot.dealers.map(x=>x.code),ledDealer.value)}${field('Amount','pAmount','','number')}${field('Particular','pPart','Payment')}${field('Reference','pRef')}<button class="btn primary" onclick="savePay()">Save</button>`;document.getElementById('modal').classList.remove('hidden')}
+async function savePay(){await gs('addPayment',{dealerCode:pDealer.value,amount:+pAmount.value,particular:pPart.value,reference:pRef.value});closeModal();loadLedger()}
+
+async function renderInvoices(){document.getElementById('view').innerHTML=`<div class="between"><div class="title">Manage Invoice</div><button class="btn primary" onclick="openInvoice()">+ New Invoice</button></div><div class="card" id="invoiceBox"></div>`;const r=await gs('invoices',{});invoiceBox.innerHTML=simpleTable(r.rows,['invoiceNo','date','dealerCode','paymentMode','paidAmount','grandTotal','balance','status'])}
+function openInvoice(){document.getElementById('modalBox').innerHTML=`<h2>New Dealer Invoice</h2>${selectField('Dealer','iDealer',boot.dealers.map(x=>x.code))}${selectField('Payment Mode','iMode',['Bank Transfer','Cash','UPI','Cheque'])}${field('Grand Total','iTotal','','number')}${field('Paid Amount','iPaid','','number')}${field('Discount','iDisc','','number')}${field('Notes','iNotes')}<button class="btn primary" onclick="saveInv()">Create Invoice</button>`;document.getElementById('modal').classList.remove('hidden')}
+async function saveInv(){await gs('saveInvoice',{invoice:{dealerCode:iDealer.value,paymentMode:iMode.value,grandTotal:+iTotal.value,paidAmount:+iPaid.value,discount:+iDisc.value,notes:iNotes.value}});closeModal();renderInvoices()}
+
+async function renderReports(){document.getElementById('view').innerHTML=`<div class="title">Reports & Analytics</div>${rangeBar()}<div class="card" id="rep"></div>`;const r=await gs('reports',{range:'thismonth'});rep.innerHTML=`<div class="grid kpis"><div class="kpi">Orders<div class="n">${r.total}</div></div><div class="kpi">Revenue<div class="n">₹${money(r.revenue)}</div></div><div class="kpi">Delivered<div class="n">${r.delivered}</div></div><div class="kpi">AOV<div class="n">₹${money(r.aov)}</div></div></div><h3>Source Performance</h3>${simpleTable(r.sources,['source','total','confirmed','delivered','revenue'])}<h3>Dealer Cumulative</h3>${simpleTable(r.dealer,['dealer','orders','qty','total','delivered'])}`}
+async function renderSales(){document.getElementById('view').innerHTML=`<div class="title">Sales Report</div><div class="card" id="salesBox">Loading...</div>`;const r=await gs('reports',{range:'thismonth'});salesBox.innerHTML=`<div class="grid kpis"><div class="kpi">Total Sales<div class="n">₹${money(r.revenue)}</div></div><div class="kpi">Delivered<div class="n">${r.delivered}</div></div><div class="kpi">AOV<div class="n">₹${money(r.aov)}</div></div></div>${simpleTable(r.sources,['source','delivered','revenue'])}`}
+async function renderIncentive(){document.getElementById('view').innerHTML=`<div class="title">Agent Incentive</div><div class="card" id="incBox">Loading...</div>`;const r=await gs('incentive',{range:'thismonth'});incBox.innerHTML=simpleTable(r.rows,['agent','mode','orders','total','online','cod','online15','cod10','incentive'])}
+function renderCourier(){placeholder('Courier Performance','Shiprocket / India Post cohort, delivery success, RTO, COD stuck and 10+ day parcels.')}
+async function renderCalls(){const r=await gs('calls',{});document.getElementById('view').innerHTML=`<div class="title">Call Monitoring</div><div class="card">${simpleTable(r.rows,['time','agent','customer','phone','orderId','direction','outcome','duration','recording','afterStatus'])}</div>`}
+async function renderUsers(){if(!['SUPER_ADMIN','MANAGER'].includes(me.role)){placeholder('Users & Access','Access denied');return}const r=await gs('users',{});document.getElementById('view').innerHTML=`<div class="between"><div class="title">Users & Access</div><button class="btn primary" onclick="openUser()">+ New User</button></div><div class="card">${simpleTable(r.rows,['id','name','username','email','role','active','workMode'])}</div>`}
+function openUser(){document.getElementById('modalBox').innerHTML=`<h2>New User</h2>${field('Name','uName')}${field('Username','uUser')}${field('Email','uEmail')}${field('Phone','uPhone')}${field('Password','uPass')}${selectField('Role','uRole',boot.user.role==='SUPER_ADMIN'?['MANAGER','ZM','AGENT','VIEWER','DEALER']:['AGENT','VIEWER'])}${selectField('Work Mode','uMode',['OFFICE','WFH'])}<button class="btn primary" onclick="saveUser()">Create</button>`;document.getElementById('modal').classList.remove('hidden')}
+async function saveUser(){await gs('saveUser',{user:{name:uName.value,username:uUser.value,email:uEmail.value,phone:uPhone.value,password:uPass.value,role:uRole.value,workMode:uMode.value,permissions:{}}});closeModal();renderUsers()}
+
+async function renderSettings(){if(me.role!=='SUPER_ADMIN'){placeholder('Settings','SUPER_ADMIN only');return}document.getElementById('view').innerHTML=`<div class="title">CRM Control Center</div><div class="card"><h3>Sources</h3>${boot.sources.map(x=>`<span class="pill" style="margin:3px">${esc(x.name)}</span>`).join('')}</div><div class="card"><h3>Statuses</h3>${boot.statuses.map(x=>`<span class="pill" style="margin:3px">${esc(x.name)}</span>`).join('')}</div><div class="card"><h3>Settings JSON</h3><textarea id="settingsJson" rows="12">${esc(JSON.stringify(boot.settings,null,2))}</textarea><button class="btn primary" onclick="saveSet()">Save Settings</button></div>`}
+async function saveSet(){try{await gs('saveSettings',{settings:JSON.parse(settingsJson.value)});toast('Settings saved')}catch(e){toast('Invalid JSON')}}
+async function renderHealth(){const r=await gs('health',{});document.getElementById('view').innerHTML=`<div class="title">System Health</div><div class="card"><b>Spreadsheet:</b> ${esc(r.spreadsheet)}<br><b>Checked:</b> ${fmt(r.time)}</div><div class="grid kpis">${Object.entries(r.counts).map(x=>`<div class="kpi">${x[0]}<div class="n">${x[1]}</div></div>`).join('')}</div>`}
+async function renderAudit(){const r=await gs('audit',{});document.getElementById('view').innerHTML=`<div class="title">Audit Logs</div><div class="card">${simpleTable(r.rows,['time','user','module','action','target','details'])}</div>`}
+function renderShiprocket(){placeholder('Shiprocket','Shipment Operations, AWB, pickup, labels, manifest, NDR and webhook integration point. Configure credentials in Settings before connecting the API.')}
+function renderIndiaPost(){placeholder('India Post','Shipment operations, wallet, COD reconciliation, barcode/article manager, receipts and webhook integration point.')}
+function placeholder(t,desc){document.getElementById('view').innerHTML=`<div class="title">${t}</div><div class="card"><h3>Module ready</h3><p class="muted">${desc}</p><p>This Google Apps Script version keeps the module UI ready and the data layer available in Google Sheets.</p></div>`}
+
+function simpleTable(rows,cols,buttons=false){if(!rows||!rows.length)return '<div class="muted">No records found.</div>';return `<div class="tablewrap"><table class="table"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${formatCell(r[c],c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+function formatCell(v,k){if(v===null||v===undefined)return '';if(k.toLowerCase().includes('date')||k==='time'||k.endsWith('At'))return fmt(v);if(typeof v==='number'&&(k.includes('amount')||k.includes('total')||k.includes('price')||k.includes('revenue')||k.includes('online')||k.includes('cod')||k.includes('balance')||k.includes('credit')||k.includes('debit')||k.includes('incentive')))return '₹'+money(v);return esc(String(v))}
+function money(n){return Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function fmt(x){if(!x)return '';const d=new Date(x);return isNaN(d)?esc(String(x)):d.toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'})}
+function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function closeModal(){document.getElementById('modal').classList.add('hidden')}
+function toggleSide(){document.querySelector('.sidebar').style.display=document.querySelector('.sidebar').style.display==='none'?'block':'none'}
+function toggleDark(){dark=!dark;document.documentElement.style.setProperty('--bg',dark?'#0b1220':'#f5f7fb');document.documentElement.style.setProperty('--card',dark?'#111827':'#fff');document.documentElement.style.setProperty('--text',dark?'#f3f4f6':'#172033')}
+function logout(){sessionStorage.removeItem('crmToken');token='';location.reload()}
+function refreshCurrent(){go(currentPage)}
+init();
+</script>
+</body>
+</html>
