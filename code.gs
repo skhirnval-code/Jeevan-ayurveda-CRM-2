@@ -8,7 +8,7 @@
  * 1. Create a Google Sheet.
  * 2. Extensions > Apps Script.
  * 3. Paste this file as Code.gs.
- * 4. Paste index.html as an HTML file.
+ * 4. (index.html GitHub Pages par host hai - yahan paste karna zaroori nahi)
  * 5. Run setupCRM() once and authorize.
  * 6. Deploy > New deployment > Web app.
  *    Execute as: Me
@@ -51,10 +51,25 @@ const CRM = {
   ]
 };
 
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('index')
-    .setTitle('HERBS CRM')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+/* ========================= HTTP ENTRY (GitHub Pages frontend) =========================
+ * Frontend (GitHub Pages) is file ko fetch() se POST karta hai:
+ *   body = JSON {action, payload}
+ * Deploy > New deployment > Web app > Execute as: Me, Who has access: Anyone
+ */
+function doGet(e) {
+  return jsonOut_({ok:true, message:'HERBS CRM API is running', time:new Date()});
+}
+
+function doPost(e) {
+  let body = {};
+  try { body = JSON.parse((e && e.postData && e.postData.contents) || '{}'); }
+  catch (err) { return jsonOut_({ok:false, error:'Invalid JSON body'}); }
+  return jsonOut_(api(body.action, body.payload || {}));
+}
+
+function jsonOut_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 /* ========================= SETUP ========================= */
@@ -451,7 +466,7 @@ function reports_(p) {
     if(o.status==='Confirmed')sources[s].confirmed++;
     if(['Delivered','GPO Delivered'].includes(o.status)){sources[s].delivered++;sources[s].revenue+=Number(o.total||0);}
   });
-  return {ok:true,range,total:orders.length,revenue:sum_(orders,'total'),delivered:delivered.length,aov:delivered.length?round_(sum_(delivered,'total')/delivered.length):0,status,sources:Object.values(sources),states:topGroup_(orders,'state'),dealer:dealerReport_(orders)};
+  return {ok:true,range:r,total:orders.length,revenue:sum_(orders,'total'),delivered:delivered.length,aov:delivered.length?round_(sum_(delivered,'total')/delivered.length):0,status,sources:Object.values(sources),states:topGroup_(orders,'state'),dealer:dealerReport_(orders)};
 }
 function incentive_(p) {
   const user=auth_(p.token);
