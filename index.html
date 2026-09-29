@@ -63,7 +63,20 @@ const NAV=[
  ['settings','⚙️ Settings'],['health','🩺 System Health'],['audit','🧾 Audit Logs'],['shiprocket','📦 Shiprocket'],['indiapost','📮 India Post']
 ];
 
-function gs(action,payload={}){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(r=>{if(r&&r.ok===false){toast(r.error||'Error');reject(r.error)}else resolve(r)}).withFailureHandler(e=>{toast(e.message||e);reject(e)}).api(action,Object.assign({token},payload))})}
+/* ===== BACKEND API URL =====
+   Apps Script me Deploy > New deployment > Web app karke jo URL mile (…/exec), use yahan paste karein. */
+const API_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+async function gs(action,payload={}){
+  if(!API_URL || API_URL.indexOf('script.google.com')<0){toast('Backend URL set nahi hai (index.html me API_URL)');throw new Error('API_URL missing');}
+  let r;
+  try{
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,payload:Object.assign({token},payload)})});
+    r=await res.json();
+  }catch(e){toast('Server se connect nahi ho paya: '+(e.message||e));throw e;}
+  if(r&&r.ok===false){toast(r.error||'Error');throw r.error;}
+  return r;
+}
 function toast(x){const e=document.getElementById('toast');e.textContent=x;e.classList.remove('hidden');setTimeout(()=>e.classList.add('hidden'),2500)}
 async function login(){
   try{const r=await gs('login',{username:loginUser.value,password:loginPass.value});token=r.token;sessionStorage.setItem('crmToken',token);me=r.user;boot=await gs('bootstrap');showApp()}
